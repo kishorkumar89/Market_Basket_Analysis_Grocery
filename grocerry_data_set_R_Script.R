@@ -1,12 +1,13 @@
 #set working directory
-setwd("E:/GIT_Hub/Market_Basket_Analysis_Grocery")
+setwd("D:/GitHub/Market_Basket_Analysis_Grocery")
 
 #read the excel data
 library(readxl)
-df_groceries=read.csv2("input/Groceries_dataset.csv",header = TRUE, sep = ',')
+grocery_data=read.csv2("input/Groceries_dataset.csv",header = TRUE, sep = ',')
 
 #removes NAs or missing values from a data frame
 #df_groceries <- df_groceries[complete.cases(retail), ]
+
 
 df_sorted <- df_groceries[order(df_groceries$Member_number),]
 df_sorted$Member_number <- as.numeric(df_sorted$Member_number)
@@ -28,7 +29,7 @@ colnames(df_itemList) <- c("itemList")
 write.csv2(df_itemList,"output/market_basket.csv", quote = FALSE, row.names = TRUE)
 
 
-txn = read.transactions('output/market_basket.csv', format='basket',sep=',')
+txn = read.transactions('output/market_basket.csv',rm.duplicates = TRUE, format='basket',sep=',')
 inspect(txn);
 
 library(arules)
@@ -45,12 +46,19 @@ library(arulesViz)
 #plot(topRules)
 plot(topRules,method="graph",interactive=TRUE,shading=NA)
 
-write.csv(rules,"output/rules_generated.csv", quote = FALSE, row.names = TRUE)
+write.csv(rules,"rules_generated.csv", quote = FALSE, row.names = TRUE)
 
 plot(topRules,method="graph",interactive=FALSE,shading=NA)
 
 arulesViz::plotly_arules(rules)
 
 plot(rules[1:20],method = "matrix",control = list(reorder = TRUE))
+
+p <- plotly_arules(rules)
+htmlwidgets::saveWidget(p, "arules.html", selfcontained = FALSE)
+browseURL("arules.html")
+
+inspectDT(rules)
+
 
 
